@@ -13,7 +13,8 @@ Happy to hear your thoughts, get tips to become better or even ideas to expand t
 
 ### TODO
 
-- [ ] refactor PCA_workflow
+- [x] refactor PCA_workflow
+- [ ] write PCA_analysis class
 - [ ] review add functionality to Handle Missing Values
 
 ### Ideas
@@ -23,5 +24,5 @@ Happy to hear your thoughts, get tips to become better or even ideas to expand t
 
 ## Acknowledgments
 
-* Hat tip to anyone whose code was used
-* thanks to Udacity for providing free online courses during Covid-quarantine and improving my coding skills 
+* Hat tip to anyone whose code inspired me
+* thanks to Udacity for providing free online courses during Covid-quarantine
