@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 from sklearn.decomposition import PCA
 
 #plots
@@ -7,8 +8,9 @@ import seaborn as sns
 sns.set_style("whitegrid")
 sns.set_context("talk")
 
-def do_pca(data_std, feature_names, top_k=10, top_pc=10):
-    """Conduct a PCA on standardized data. Show scree plot and heatmap factor loadings
+def do_pca(data_std, feature_names=None, top_k=10, top_pc=10):
+    """Conduct a PCA on standardized data. Show scree plot and heatmap of factor loadings. 
+        Returns a PCA object and the PCA tranformation of the data.
      
     Input
         data_std: dataframe containing standardized data
@@ -19,12 +21,20 @@ def do_pca(data_std, feature_names, top_k=10, top_pc=10):
     Return 
         tuple: (pca object, pca transformation)
     """
+    # store feature names if not given
+    if feature_names is None:
+        feature_names = list(data_std.columns)
     
+    #---------------
+    ### 1.
     # initialize and compute pca
     pca = PCA()
-    X_pca = pca.fit_transform(X_std)
+    X_pca = pca.fit_transform(data_std)
     
-    ## PRINT BASIC INFO
+    
+    #---------------
+    ### 2.
+    # print explained variance for each component
     n_components = len(pca.explained_variance_ratio_)
     explained_variance = pca.explained_variance_ratio_
     cum_explained_variance = np.cumsum(explained_variance)
@@ -46,11 +56,11 @@ def do_pca(data_std, feature_names, top_k=10, top_pc=10):
     print('-'*40)
     
     
-    
-    ## SCREE PLOT: Explained variance
+    #---------------
+    ### 3. 
+    # Explained variance plot (scree plot)
     df_explained_variance_limited = df_explained_variance.iloc[:top_pc,:]
 
-    #make scree plot
     fig, ax1 = plt.subplots(figsize=(15,6))
 
     ax1.set_title('Explained variance across principal components', fontsize=14)
@@ -65,7 +75,8 @@ def do_pca(data_std, feature_names, top_k=10, top_pc=10):
     ax2 = sns.lineplot(x=idx[:top_pc]-1, y='cumulative', data=df_explained_variance_limited, color='#fc8d59')
 
     ax1.axhline(mean_explained_variance, ls='--', color='#fc8d59') #plot mean
-    ax1.text(-.8, mean_explained_variance+(mean_explained_variance*.05), "average", color='#fc8d59', fontsize=14) #label y axis
+    #label y axis
+    ax1.text(-.8, mean_explained_variance+(mean_explained_variance*.05), "average", color='#fc8d59', fontsize=14) 
 
     max_y1 = max(df_explained_variance_limited.iloc[:,0])
     max_y2 = max(df_explained_variance_limited.iloc[:,1])
@@ -75,10 +86,9 @@ def do_pca(data_std, feature_names, top_k=10, top_pc=10):
     plt.show()
     
     
-    
-    
-    ## FACTOR LOADINGS
-    # df factor loadings
+    #---------------
+    ### 4. 
+    # Correlations of features with components
     df_c = pd.DataFrame(pca.components_, columns=feature_names).T
 
     print("Factor Loadings of 1st PC")
@@ -99,4 +109,7 @@ def do_pca(data_std, feature_names, top_k=10, top_pc=10):
     sns.heatmap(df_c.iloc[:,:top_pc], annot=True, cmap="YlGnBu", ax=ax)
     plt.show()
     
+    #---------------
+    ### 5.
+    # Pca object and transformed data
     return pca, pd.DataFrame(X_pca)
