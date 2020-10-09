@@ -9,13 +9,15 @@
 #	https://drive.google.com/file/d/1XXA6JWZ1PsrCZc3P38fYx5HGjv4kMeik/view?usp=sharing
 #		
 #		1. Store credentials of e.g. an admin user
-# 		2. Configure redshift cluster accordingly 
+# 	2. Configure redshift cluster accordingly 
 #
 
 import pandas as pd
 import boto3
 import json
 import configparser
+from workbench import Time as t
+
 
 
 # STEP 0: Make sure you have an AWS secret and access key
@@ -151,7 +153,7 @@ except Exception as e:
 # 	run this block several times until the cluster status becomes Available
 
 def prettyRedshiftProps(props):
-    pd.set_option('display.max_colwidth', -1)
+    pd.set_option('display.max_colwidth', None)
     keysToShow = ["ClusterIdentifier", "NodeType", "ClusterStatus", "MasterUsername", "DBName", "Endpoint", "NumberOfNodes", 'VpcId']
     x = [(k, v) for k,v in props.items() if k in keysToShow]
     print( pd.DataFrame(data=x, columns=["Key", "Value"]))
@@ -161,6 +163,9 @@ prettyRedshiftProps(myClusterProps)
 
 # 2.2 Take note of the cluster endpoint and role ARN 
 # 	DO NOT RUN THIS unless the cluster status becomes "Available"
+
+t.sleep_countdown(120, print_step=2)
+
 
 DWH_ENDPOINT = myClusterProps['Endpoint']['Address']
 DWH_ROLE_ARN = myClusterProps['IamRoles'][0]['IamRoleArn']
